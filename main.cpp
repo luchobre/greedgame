@@ -7,7 +7,7 @@ int main() {
     do {
         opc = menu();
         options(opc);
-    } while (opc != 0);
+    } while (opc != 5);
 
     return 0;
 }
