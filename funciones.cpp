@@ -5,36 +5,82 @@
 #include <cctype>
 #include <algorithm>
 #include <numeric>
+#include <windows.h>
+#include "rlutil.h"
 #include "funciones.h"
 using namespace std;
 
 int menu()
 {
-    int opc;
+    int opc =1,y=0;
+    rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
+    rlutil::setColor(rlutil::WHITE);
+
     do
     {
-        cout << "                              GREED                    " << endl;
-        cout << "                    _______________________________                    " << endl;
-        cout << "                              1- 1 JUGADOR                    " << endl;
-        cout << "                              2- 2 JUGADORES                    " << endl;
-        cout << "                              3- ESTADISTICAS                    " << endl;
-        cout << "                              4- CREDITOS                    " << endl;
-        cout << "                    _______________________________                    " << endl;
-        cout << "                              0- SALIR                    " << endl;
-        cin >> opc;
+        rlutil::cls();
+        rlutil::hidecursor();
 
-        if (opc >= 0 && opc <= 4)
+        rlutil::locate(60, 10);
+        cout << "GREED" << endl <<endl;
+
+        showItem("1 JUGADOR", 50, 12, y==0);
+        showItem("2 JUGADORES", 50, 13, y==1);
+        showItem("ESTADISTICAS", 50, 14, y==2);
+        showItem("CREDITOS", 50, 15, y==3);
+        showItem("SALIR", 50, 16, y==4);
+
+        rlutil::locate(47, 12 + y);
+        cout << (char)175 << endl;
+
+        rlutil::locate(63, 12 + y);
+        cout << (char)174 << endl;
+
+        int key = rlutil::getkey();
+
+
+        switch (key)
         {
+        case 14:
+            if(y>0)
+            {
+                y--;
+                opc--;
+            }
+            break;
+        case 15:
+            if(y<4)
+            {
+                y++;
+                opc++;
+            }
+            break;
+        case 1:
             return opc;
+            break;
+        default:
+            break;
+        }
+    }
+    while(true);
+}
+
+//Logica para poner fondo de color a lo seleccionado en el menu
+
+void showItem(const char* text, int posx, int posy, bool selected)
+    {
+        if(selected)
+        {
+            rlutil::setBackgroundColor(rlutil::BLUE);
         }
         else
         {
-            cout << "Opción no válida. Intente nuevamente." << endl;
+           rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
         }
-
+        rlutil::locate(posx, posy);
+        cout<<text<<endl;
+        rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
     }
-    while (opc != 0);
-}
 
 //Logica de juego 1 jugador
 
@@ -45,6 +91,8 @@ void onePlayer()
     cin >> nombreJugador1;
 
     cout << endl << "Bienvenido " << nombreJugador1 << "! Mucha suerte!" << endl;
+    cout << "Presione cualquier tecla para lanzar los dados...";
+    rlutil::anykey();
 
     int puntajeTotal = 0;
 
@@ -54,8 +102,10 @@ void onePlayer()
         puntajeTotal += jugarRonda();
         cout << "Puntaje total acumulado: " << puntajeTotal << endl;
     }
-
+    PlaySound(TEXT("winner.wav"), NULL, SND_FILENAME | SND_ASYNC);
     cout << "Puntaje final de " << nombreJugador1 << ": " << puntajeTotal << endl;
+    cout << "Presione cualquier tecla para regresar al menu principal...";
+    rlutil::anykey();
 }
 
 //Logica de juego 2 jugadores
@@ -70,6 +120,8 @@ void twoPlayers()
     cin >> nombreJugador2;
 
     cout << endl << "Bienvenidos " << nombreJugador1 << " y " << nombreJugador2 << "! Mucha suerte!" << endl;
+    cout << "Presione cualquier tecla para lanzar los dados...";
+    rlutil::anykey();
 
     int puntajeTotal1 = 0, puntajeTotal2 = 0;
 
@@ -77,11 +129,11 @@ void twoPlayers()
     {
         cout << endl << "               --------------- Ronda " << ronda << " ---------------               " << endl;
 
-        cout << "Turno de " << nombreJugador1 << endl;
+        cout <<endl << "Turno de " << nombreJugador1 << endl;
         puntajeTotal1 += jugarRonda();
         cout << "Puntaje total acumulado de " << nombreJugador1 << ": " << puntajeTotal1 << endl;
 
-        cout << "Turno de " << nombreJugador2 << endl;
+        cout <<endl << "Turno de " << nombreJugador2 << endl;
         puntajeTotal2 += jugarRonda();
         cout << "Puntaje total acumulado de " << nombreJugador2 << ": " << puntajeTotal2 << endl;
     }
@@ -91,21 +143,25 @@ void twoPlayers()
 
     if (puntajeTotal1 > puntajeTotal2)
     {
+        PlaySound(TEXT("winner.wav"), NULL, SND_FILENAME | SND_ASYNC);
         cout << nombreJugador1 << " gana el juego!" << endl;
     }
     else if (puntajeTotal2 > puntajeTotal1)
     {
+        PlaySound(TEXT("winner.wav"), NULL, SND_FILENAME | SND_ASYNC);
         cout << nombreJugador2 << " gana el juego!" << endl;
     }
     else
     {
         cout << "Es un empate!" << endl;
     }
+    cout << "Presione cualquier tecla para regresar al menu principal...";
+    rlutil::anykey();
 }
 
 void creditos ()
 {
-    cout << endl << "Juego creado por el grupo N 12 de Programacion 1 para la UTN-Facultad Regional General Pacheco" << endl << endl;
+    cout << endl << "Juego creado por el grupo N 21 de Programacion 1 para la UTN-Facultad Regional General Pacheco" << endl << endl;
     cout << "Maria Sol Collao Pichilingue"<< endl;
     cout << "Rodrigo Fernando Rimbau "    << endl ;
     cout << "Francisco Degui"             << endl  ;
@@ -113,9 +169,10 @@ void creditos ()
 }
 
 
-//Funcion para tirar un dado
+//Funcion para tirar un dado                    S
 int tirarDado()
 {
+    PlaySound(TEXT("tirardados.wav"), NULL, SND_FILENAME | SND_ASYNC);
     return (rand() % 6) + 1;
 }
 
@@ -214,21 +271,28 @@ void options(int opc)
     switch (opc)
     {
     case 1:
+        rlutil::locate(50, 20);
         onePlayer();
         break;
     case 2:
+        rlutil::locate(50, 20);
         twoPlayers();
         break;
     case 3:
+        rlutil::locate(50, 20);
         cout << "Esta es la opcion 3 (Estadísticas)" << endl;
         break;
     case 4:
+        rlutil::locate(50, 20);
         creditos();
+        rlutil::anykey();
         break;
-    case 0:
+    case 5:
+        rlutil::locate(50, 20);
         cout << "Cerrando el juego..." << endl;
         break;
     default:
+        rlutil::locate(50, 20);
         cout << "Opción no válida" << endl;
     }
 }
