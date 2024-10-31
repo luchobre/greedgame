@@ -10,3 +10,4 @@ void onePlayer();
 void twoPlayers();
 int menu();
 void options(int opc);
+void showItem(const char* text, int posx, int posy, bool selected);
