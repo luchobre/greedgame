@@ -197,7 +197,7 @@ void estadisticas()
 void creditos ()
 {
     cout << endl << "Juego creado por el grupo N 21 de Programacion 1 para la UTN-Facultad Regional General Pacheco" << endl << endl;
-    cout << "Maria Sol Collao Pichilingue"<< endl;
+    cout << "Maria Sol Collao Pichilingue N 28030"<< endl;
     cout << "Rodrigo Fernando Rimbau "    << endl ;
     cout << "Francisco Degui"             << endl  ;
     cout << "Luciano Matias Bregoli, Legajo N 31784"       << endl  ;
