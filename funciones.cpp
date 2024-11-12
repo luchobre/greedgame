@@ -68,21 +68,24 @@ int menu()
 //Logica para poner fondo de color a lo seleccionado en el menu
 
 void showItem(const char* text, int posx, int posy, bool selected)
+{
+    if(selected)
     {
-        if(selected)
-        {
-            rlutil::setBackgroundColor(rlutil::BLUE);
-        }
-        else
-        {
-           rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
-        }
-        rlutil::locate(posx, posy);
-        cout<<text<<endl;
+        rlutil::setBackgroundColor(rlutil::BLUE);
+    }
+    else
+    {
         rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
     }
+    rlutil::locate(posx, posy);
+    cout<<text<<endl;
+    rlutil::setBackgroundColor(rlutil::LIGHTBLUE);
+}
 
 //Logica de juego 1 jugador
+
+string jugadorMayorPuntaje ="";
+int puntajeMasAlto = 0;
 
 void onePlayer()
 {
@@ -90,20 +93,28 @@ void onePlayer()
     cout << endl << "Ingrese el nombre del Jugador N 1: ";
     cin >> nombreJugador1;
 
-    cout << endl << "Bienvenido " << nombreJugador1 << "! Mucha suerte!" << endl;
-    cout << "Presione cualquier tecla para lanzar los dados...";
+    cout << endl << "Bienvenido " << nombreJugador1 << "! Mucha suerte!" << endl<<endl;
+    cout << "Presione cualquier tecla para lanzar los dados..." <<endl;
     rlutil::anykey();
 
     int puntajeTotal = 0;
 
-    for (int ronda = 1; ronda <= 3; ++ronda)
+    for (int ronda = 1; ronda <= 3; ronda++)
     {
         cout << endl << "               --------------- Ronda " << ronda << " ---------------               " << endl;
         puntajeTotal += jugarRonda();
         cout << "Puntaje total acumulado: " << puntajeTotal << endl;
     }
     PlaySound(TEXT("winner.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
     cout << "Puntaje final de " << nombreJugador1 << ": " << puntajeTotal << endl;
+
+    if(puntajeTotal>puntajeMasAlto)
+    {
+        jugadorMayorPuntaje = nombreJugador1;
+        puntajeMasAlto = puntajeTotal;
+    }
+
     cout << "Presione cualquier tecla para regresar al menu principal...";
     rlutil::anykey();
 }
@@ -131,15 +142,15 @@ void twoPlayers()
 
         cout <<endl << "Turno de " << nombreJugador1 << endl;
         puntajeTotal1 += jugarRonda();
-        cout << "Puntaje total acumulado de " << nombreJugador1 << ": " << puntajeTotal1 << endl;
+        cout << "Puntaje total acumulado de " << nombreJugador1 << ": " << puntajeTotal1 << endl<< endl;
 
         cout <<endl << "Turno de " << nombreJugador2 << endl;
         puntajeTotal2 += jugarRonda();
-        cout << "Puntaje total acumulado de " << nombreJugador2 << ": " << puntajeTotal2 << endl;
+        cout << "Puntaje total acumulado de " << nombreJugador2 << ": " << puntajeTotal2 << endl<< endl;
     }
 
-    cout << "Puntaje final de " << nombreJugador1 << ": " << puntajeTotal1 << endl;
-    cout << "Puntaje final de " << nombreJugador2 << ": " << puntajeTotal2 << endl;
+    cout << "Puntaje final de " << nombreJugador1 << ": " << puntajeTotal1 << endl<< endl;
+    cout << "Puntaje final de " << nombreJugador2 << ": " << puntajeTotal2 << endl<< endl;
 
     if (puntajeTotal1 > puntajeTotal2)
     {
@@ -155,8 +166,32 @@ void twoPlayers()
     {
         cout << "Es un empate!" << endl;
     }
+
+    if(puntajeTotal1>puntajeMasAlto)
+    {
+        jugadorMayorPuntaje = nombreJugador1;
+        puntajeMasAlto = puntajeTotal1;
+    }
+    else if(puntajeTotal2>puntajeMasAlto)
+    {
+        jugadorMayorPuntaje = nombreJugador2;
+        puntajeMasAlto = puntajeTotal2;
+    }
+
     cout << "Presione cualquier tecla para regresar al menu principal...";
     rlutil::anykey();
+}
+
+void estadisticas()
+{
+    if(puntajeMasAlto > 0)
+    {
+        cout << "El jugador con mayor puntaje es " << jugadorMayorPuntaje << " con un puntaje de " <<puntajeMasAlto <<endl;
+    }
+    else
+    {
+        cout << "No se han registrado puntajes por el momento" << endl;
+    }
 }
 
 void creditos ()
@@ -165,11 +200,11 @@ void creditos ()
     cout << "Maria Sol Collao Pichilingue"<< endl;
     cout << "Rodrigo Fernando Rimbau "    << endl ;
     cout << "Francisco Degui"             << endl  ;
-    cout << "Luciano Matias Bregoli"       << endl  ;
+    cout << "Luciano Matias Bregoli, Legajo N 31784"       << endl  ;
 }
 
 
-//Funcion para tirar un dado                    S
+//Funcion para tirar un dado
 int tirarDado()
 {
     PlaySound(TEXT("tirardados.wav"), NULL, SND_FILENAME | SND_ASYNC);
@@ -179,7 +214,7 @@ int tirarDado()
 //Funcion para mostrar los dados lanzados
 void mostrarDados(const vector<int>& dados)
 {
-    for (int i = 0; i < dados.size(); ++i)
+    for (int i = 0; i < dados.size(); i++)
     {
         cout << "     Dado " << i + 1 << ": " << dados[i] << endl;
     }
@@ -221,7 +256,7 @@ int jugarRonda()
         }
         else
         {
-            for (int i = 0; i < dados.size(); ++i)
+            for (int i = 0; i < dados.size(); i++)
             {
                 //Verificar si los dados son distintos o iguales a los bloqueadores para dejarlos del vector o borrarlos
                 if (dados[i] != blocker1 && dados[i] != blocker2)
@@ -243,7 +278,7 @@ int jugarRonda()
         //Se verifica si el vector está o no vacio para continuar jugando o terminar la ronda.
         if (!dados.empty())
         {
-            cout << "Deseas seguir tirando? (S/N): ";
+            cout << "Presione (S) para seguir tirando, de lo contrario, presione cualquier tecla..." <<endl;
             cin >> seguir;
             seguir = toupper(seguir);
             cout << endl;
@@ -268,31 +303,30 @@ int jugarRonda()
 
 void options(int opc)
 {
+    rlutil::cls();
+    rlutil::locate(5, 5);
+
     switch (opc)
     {
     case 1:
-        rlutil::locate(50, 20);
         onePlayer();
         break;
     case 2:
-        rlutil::locate(50, 20);
         twoPlayers();
         break;
     case 3:
-        rlutil::locate(50, 20);
-        cout << "Esta es la opcion 3 (Estadísticas)" << endl;
+        estadisticas();
+        rlutil::anykey();
         break;
     case 4:
-        rlutil::locate(50, 20);
         creditos();
         rlutil::anykey();
         break;
     case 5:
-        rlutil::locate(50, 20);
         cout << "Cerrando el juego..." << endl;
         break;
     default:
-        rlutil::locate(50, 20);
         cout << "Opción no válida" << endl;
+        rlutil::anykey();
     }
 }
